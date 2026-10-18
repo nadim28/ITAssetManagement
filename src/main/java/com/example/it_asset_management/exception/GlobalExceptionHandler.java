@@ -50,8 +50,12 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorResponse handleUnreadable(HttpMessageNotReadableException ex, HttpServletRequest request) {
-		return new ErrorResponse(LocalDateTime.now(), 400, "Bad Request",
-			"Malformed request body — check the JSON syntax and value formats", null, request.getRequestURI());
+		String message = "Malformed request body — check the JSON syntax and value formats";
+		Throwable cause = ex.getMostSpecificCause();
+		if (cause instanceof IllegalArgumentException && cause.getMessage() != null) {
+			message = cause.getMessage();
+		}
+		return new ErrorResponse(LocalDateTime.now(), 400, "Bad Request", message, null, request.getRequestURI());
 	}
 
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
