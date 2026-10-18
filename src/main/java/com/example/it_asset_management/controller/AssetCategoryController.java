@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.it_asset_management.entity.AssetCategory;
+import com.example.it_asset_management.dto.AssetCategoryRequest;
+import com.example.it_asset_management.dto.AssetCategoryResponse;
 import com.example.it_asset_management.service.AssetCategoryService;
 
 @RestController
@@ -27,24 +28,24 @@ public class AssetCategoryController {
 	}
 
 	@GetMapping
-	public List<AssetCategory> getAll() {
+	public List<AssetCategoryResponse> getAll() {
 		return service.getAll();
 	}
 
 	@GetMapping("/{id}")
-	public AssetCategory getById(@PathVariable Long id) {
+	public AssetCategoryResponse getById(@PathVariable Long id) {
 		return service.getById(id);
 	}
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public AssetCategory create(@RequestBody AssetCategory request) {
-		return service.create(request.getName(), request.getDescription());
+	public AssetCategoryResponse create(@RequestBody AssetCategoryRequest request) {
+		return service.create(request);
 	}
 
 	@PutMapping("/{id}")
-	public AssetCategory update(@PathVariable Long id, @RequestBody AssetCategory request) {
-		return service.update(id, request.getName(), request.getDescription());
+	public AssetCategoryResponse update(@PathVariable Long id, @RequestBody AssetCategoryRequest request) {
+		return service.update(id, request);
 	}
 
 	@DeleteMapping("/{id}")
