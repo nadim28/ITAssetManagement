@@ -11,6 +11,7 @@ import com.example.it_asset_management.dto.AssetResponse;
 import com.example.it_asset_management.entity.Asset;
 import com.example.it_asset_management.entity.AssetCategory;
 import com.example.it_asset_management.entity.Vendor;
+import com.example.it_asset_management.exception.DuplicateResourceException;
 import com.example.it_asset_management.repository.AssetCategoryRepository;
 import com.example.it_asset_management.repository.AssetRepository;
 import com.example.it_asset_management.repository.VendorRepository;
@@ -44,6 +45,9 @@ public class AssetService {
 
 	@Transactional
 	public AssetResponse create(AssetRequest request) {
+		if (assetRepository.existsByAssetCodeIgnoreCase(request.assetCode())) {
+			throw new DuplicateResourceException("Asset code already exists: " + request.assetCode());
+		}
 		AssetCategory category = resolveCategory(request.categoryId());
 		Vendor vendor = resolveVendor(request.vendorId());
 
@@ -54,6 +58,9 @@ public class AssetService {
 
 	@Transactional
 	public AssetResponse update(Long id, AssetRequest request) {
+		if (assetRepository.existsByAssetCodeIgnoreCaseAndIdNot(request.assetCode(), id)) {
+			throw new DuplicateResourceException("Asset code already exists: " + request.assetCode());
+		}
 		Asset asset = getEntityById(id);
 		AssetCategory category = resolveCategory(request.categoryId());
 		Vendor vendor = resolveVendor(request.vendorId());
