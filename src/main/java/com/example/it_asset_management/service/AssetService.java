@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.it_asset_management.dto.AssetRequest;
+import com.example.it_asset_management.dto.AssetResponse;
 import com.example.it_asset_management.entity.Asset;
 import com.example.it_asset_management.entity.AssetCategory;
 import com.example.it_asset_management.entity.Vendor;
@@ -30,33 +31,35 @@ public class AssetService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<Asset> getAll() {
-		return assetRepository.findAll();
+	public List<AssetResponse> getAll() {
+		return assetRepository.findAll().stream()
+			.map(AssetService::toResponse)
+			.toList();
 	}
 
 	@Transactional(readOnly = true)
-	public Asset getById(Long id) {
-		return getEntityById(id);
+	public AssetResponse getById(Long id) {
+		return toResponse(getEntityById(id));
 	}
 
 	@Transactional
-	public Asset create(AssetRequest request) {
+	public AssetResponse create(AssetRequest request) {
 		AssetCategory category = resolveCategory(request.categoryId());
 		Vendor vendor = resolveVendor(request.vendorId());
 
 		Asset asset = new Asset();
 		applyRequest(asset, request, category, vendor);
-		return assetRepository.save(asset);
+		return toResponse(assetRepository.save(asset));
 	}
 
 	@Transactional
-	public Asset update(Long id, AssetRequest request) {
+	public AssetResponse update(Long id, AssetRequest request) {
 		Asset asset = getEntityById(id);
 		AssetCategory category = resolveCategory(request.categoryId());
 		Vendor vendor = resolveVendor(request.vendorId());
 
 		applyRequest(asset, request, category, vendor);
-		return assetRepository.save(asset);
+		return toResponse(assetRepository.save(asset));
 	}
 
 	@Transactional
@@ -91,5 +94,17 @@ public class AssetService {
 		asset.setStatus(request.status());
 		asset.setCategory(category);
 		asset.setVendor(vendor);
+	}
+
+	private static AssetResponse toResponse(Asset asset) {
+		return new AssetResponse(
+			asset.getId(),
+			asset.getAssetCode(),
+			asset.getName(),
+			asset.getPurchaseDate(),
+			asset.getPurchasePrice(),
+			asset.getStatus(),
+			asset.getCategory().getName(),
+			asset.getVendor().getName());
 	}
 }
