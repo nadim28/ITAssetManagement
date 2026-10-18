@@ -17,6 +17,8 @@ import com.example.it_asset_management.dto.AssetCategoryRequest;
 import com.example.it_asset_management.dto.AssetCategoryResponse;
 import com.example.it_asset_management.service.AssetCategoryService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/asset-categories")
 public class AssetCategoryController {
@@ -39,12 +41,12 @@ public class AssetCategoryController {
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public AssetCategoryResponse create(@RequestBody AssetCategoryRequest request) {
+	public AssetCategoryResponse create(@Valid @RequestBody AssetCategoryRequest request) {
 		return service.create(request);
 	}
 
 	@PutMapping("/{id}")
-	public AssetCategoryResponse update(@PathVariable Long id, @RequestBody AssetCategoryRequest request) {
+	public AssetCategoryResponse update(@PathVariable Long id, @Valid @RequestBody AssetCategoryRequest request) {
 		return service.update(id, request);
 	}
 
