@@ -9,4 +9,8 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
 	boolean existsByAssetCodeIgnoreCaseAndIdNot(String assetCode, Long id);
 
 	boolean existsByAssetCodeIgnoreCase(String assetCode);
+
+	boolean existsByCategoryId(Long categoryId);
+
+	boolean existsByVendorId(Long vendorId);
 }

@@ -11,14 +11,17 @@ import com.example.it_asset_management.dto.AssetCategoryResponse;
 import com.example.it_asset_management.entity.AssetCategory;
 import com.example.it_asset_management.exception.DuplicateResourceException;
 import com.example.it_asset_management.repository.AssetCategoryRepository;
+import com.example.it_asset_management.repository.AssetRepository;
 
 @Service
 public class AssetCategoryService {
 
 	private final AssetCategoryRepository repository;
+	private final AssetRepository assetRepository;
 
-	public AssetCategoryService(AssetCategoryRepository repository) {
+	public AssetCategoryService(AssetCategoryRepository repository, AssetRepository assetRepository) {
 		this.repository = repository;
+		this.assetRepository = assetRepository;
 	}
 
 	@Transactional(readOnly = true)
@@ -61,6 +64,10 @@ public class AssetCategoryService {
 	public void delete(Long id) {
 		if (!repository.existsById(id)) {
 			throw new NoSuchElementException("Asset category not found: id=" + id);
+		}
+		if (assetRepository.existsByCategoryId(id)) {
+			throw new DuplicateResourceException(
+				"Cannot delete category: assets are still assigned to it (id=" + id + ")");
 		}
 		repository.deleteById(id);
 	}

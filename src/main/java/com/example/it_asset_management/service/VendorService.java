@@ -9,15 +9,19 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.it_asset_management.dto.VendorRequest;
 import com.example.it_asset_management.dto.VendorResponse;
 import com.example.it_asset_management.entity.Vendor;
+import com.example.it_asset_management.exception.DuplicateResourceException;
+import com.example.it_asset_management.repository.AssetRepository;
 import com.example.it_asset_management.repository.VendorRepository;
 
 @Service
 public class VendorService {
 
 	private final VendorRepository repository;
+	private final AssetRepository assetRepository;
 
-	public VendorService(VendorRepository repository) {
+	public VendorService(VendorRepository repository, AssetRepository assetRepository) {
 		this.repository = repository;
+		this.assetRepository = assetRepository;
 	}
 
 	@Transactional(readOnly = true)
@@ -50,6 +54,10 @@ public class VendorService {
 	public void delete(Long id) {
 		if (!repository.existsById(id)) {
 			throw new NoSuchElementException("Vendor not found: id=" + id);
+		}
+		if (assetRepository.existsByVendorId(id)) {
+			throw new DuplicateResourceException(
+				"Cannot delete vendor: assets are still assigned to it (id=" + id + ")");
 		}
 		repository.deleteById(id);
 	}
