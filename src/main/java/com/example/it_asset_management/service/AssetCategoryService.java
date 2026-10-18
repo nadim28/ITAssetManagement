@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.it_asset_management.dto.AssetCategoryRequest;
 import com.example.it_asset_management.dto.AssetCategoryResponse;
 import com.example.it_asset_management.entity.AssetCategory;
+import com.example.it_asset_management.exception.DuplicateResourceException;
 import com.example.it_asset_management.repository.AssetCategoryRepository;
 
 @Service
@@ -34,6 +35,10 @@ public class AssetCategoryService {
 
 	@Transactional
 	public AssetCategoryResponse create(AssetCategoryRequest request) {
+		if (repository.existsByNameIgnoreCase(request.name())) {
+			throw new DuplicateResourceException(
+				"Category name already exists: " + request.name());
+		}
 		AssetCategory category = new AssetCategory();
 		category.setName(request.name());
 		category.setDescription(request.description());
@@ -42,6 +47,10 @@ public class AssetCategoryService {
 
 	@Transactional
 	public AssetCategoryResponse update(Long id, AssetCategoryRequest request) {
+		if (repository.existsByNameIgnoreCaseAndIdNot(request.name(), id)) {
+			throw new DuplicateResourceException(
+				"Category name already exists: " + request.name());
+		}
 		AssetCategory category = getEntityById(id);
 		category.setName(request.name());
 		category.setDescription(request.description());
