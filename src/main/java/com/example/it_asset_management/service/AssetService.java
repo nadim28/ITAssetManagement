@@ -1,8 +1,9 @@
 package com.example.it_asset_management.service;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,6 +11,7 @@ import com.example.it_asset_management.dto.AssetRequest;
 import com.example.it_asset_management.dto.AssetResponse;
 import com.example.it_asset_management.entity.Asset;
 import com.example.it_asset_management.entity.AssetCategory;
+import com.example.it_asset_management.entity.AssetStatus;
 import com.example.it_asset_management.entity.Vendor;
 import com.example.it_asset_management.exception.DuplicateResourceException;
 import com.example.it_asset_management.repository.AssetCategoryRepository;
@@ -32,10 +34,9 @@ public class AssetService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<AssetResponse> getAll() {
-		return assetRepository.findAll().stream()
-			.map(AssetService::toResponse)
-			.toList();
+	public Page<AssetResponse> getAll(Pageable pageable, String keyword, Long categoryId, AssetStatus status) {
+		return assetRepository.search(keyword, categoryId, status, pageable)
+			.map(AssetService::toResponse);
 	}
 
 	@Transactional(readOnly = true)

@@ -73,6 +73,24 @@ public class GlobalExceptionHandler {
 			"No endpoint at " + request.getRequestURI(), null, request.getRequestURI());
 	}
 
+	@ExceptionHandler(org.springframework.data.core.PropertyReferenceException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorResponse handlePropertyReference(org.springframework.data.core.PropertyReferenceException ex,
+			HttpServletRequest request) {
+		return new ErrorResponse(LocalDateTime.now(), 400, "Bad Request",
+			"Unknown property in query: '" + ex.getPropertyName() + "'",
+			null, request.getRequestURI());
+	}
+
+	@ExceptionHandler(org.springframework.dao.InvalidDataAccessApiUsageException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorResponse handleInvalidQueryUsage(org.springframework.dao.InvalidDataAccessApiUsageException ex,
+			HttpServletRequest request) {
+		return new ErrorResponse(LocalDateTime.now(), 400, "Bad Request",
+			"Invalid query — unknown sort or filter property",
+			null, request.getRequestURI());
+	}
+
 	@ExceptionHandler(Exception.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public ErrorResponse handleUnexpected(Exception ex, HttpServletRequest request) {
